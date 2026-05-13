@@ -3,7 +3,7 @@ import { useAppStore } from '../../store/appStore';
 import { Target, Zap, Binary, Image as ImageIcon, BookOpen, Share2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+import { InlineMath } from 'react-katex';
 
 export const SummaryPanel: React.FC = () => {
   const { summary, isProcessing } = useAppStore();
@@ -63,7 +63,7 @@ export const SummaryPanel: React.FC = () => {
               { label: 'Context', color: 'emerald' },
               { label: 'Method', color: 'indigo' },
               { label: 'Result', color: 'amber' },
-            ].map(({ label, color }, i) => (
+            ].map(({ label, color }) => (
               <div key={label} className="flex flex-col items-center gap-1">
                 <div className={`w-1.5 h-1.5 rounded-full bg-${color}-500/40`} />
                 <span className="text-[8px] font-bold uppercase tracking-widest text-slate-600">{label}</span>

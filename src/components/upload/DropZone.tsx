@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Upload, CheckCircle2, File, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Upload, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';

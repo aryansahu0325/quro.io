@@ -4,7 +4,7 @@ import { SummaryPanel } from '../components/summary/SummaryPanel';
 import { ChatPanel } from '../components/chat/ChatPanel';
 import { ChallengePanel } from '../components/challenge/ChallengePanel';
 import { PDFPreview } from '../components/workspace/PDFPreview';
-import { FileText, Brain, LayoutDashboard, Settings, RefreshCw } from 'lucide-react';
+import { FileText, Brain, LayoutDashboard, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const WorkspacePage: React.FC = () => {

@@ -1,5 +1,4 @@
-import React from 'react';
-import { Brain, Sparkles } from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 export const ChallengePanel: React.FC = () => {
   return (

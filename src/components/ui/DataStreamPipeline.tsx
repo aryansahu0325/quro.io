@@ -61,7 +61,7 @@ export const DataStreamPipeline: React.FC = () => {
               { icon: Database, label: 'VECTOR', color: 'teal', detail: '1536-D' },
               { icon: Cpu, label: 'INFER', color: 'indigo', detail: 'Llama-3.1' },
               { icon: Brain, label: 'SYNTH', color: 'emerald', detail: 'Grounded' },
-            ].map((node, i) => (
+            ].map((node) => (
               <div key={node.label} className="relative flex flex-col items-center">
                 {/* Node Housing */}
                 <motion.div 
@@ -97,12 +97,11 @@ export const DataStreamPipeline: React.FC = () => {
             { label: 'Processing Load', val: '14.2%', icon: Zap },
             { label: 'Stream Nodes', val: '12,042', icon: Share2 },
             { label: 'Data Efficiency', val: '98.4%', icon: Database },
-          ].map((stat, i) => (
+          ].map((stat) => (
             <motion.div 
-              key={i}
+              key={Math.random()}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              transition={{ delay: i * 0.1 }}
               className="flex items-center gap-4 py-4"
             >
               <div className="w-px h-8 bg-emerald-500/20" />

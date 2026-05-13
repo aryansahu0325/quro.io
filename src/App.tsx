@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Header } from './components/layout/Header';
 import { LandingPage } from './pages/LandingPage';
 import { WorkspacePage } from './pages/WorkspacePage';

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Binary, Database, Shield, ArrowRight, Cpu, Zap, Lock, Sparkles, MessageSquare, Search, Layers, Terminal as TerminalIcon, Globe, Activity, Cpu as CpuIcon } from 'lucide-react';
+import { Binary, Database, Shield, ArrowRight, Zap, Sparkles, MessageSquare, Search, Layers, Activity } from 'lucide-react';
 import { DropZone } from '../components/upload/DropZone';
 import { Footer } from '../components/layout/Footer';
 import { DataStreamPipeline } from '../components/ui/DataStreamPipeline';
-import { motion, useScroll, useTransform, useSpring, useInView, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 15 },
