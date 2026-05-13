@@ -86,7 +86,7 @@ export const SummaryPanel: React.FC = () => {
       </Section>
 
       {/* Dual summaries */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <Section icon={<BookOpen className="w-3.5 h-3.5 text-emerald-500/60" />} title="Thesis">
           <p className="text-[10px] text-slate-500 leading-normal font-medium">{demoSummary.english_summary}</p>
         </Section>
@@ -98,7 +98,7 @@ export const SummaryPanel: React.FC = () => {
       </div>
 
       {/* Math & pictorial */}
-      <div className="grid grid-cols-2 gap-2 pb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4">
         <Section icon={<Binary className="w-3.5 h-3.5 text-amber-500/60" />} title="Axioms">
           <div className="space-y-2">
             {demoSummary.mathematical_insights?.map((item: string, i: number) => (

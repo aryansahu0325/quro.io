@@ -19,7 +19,7 @@ export const DropZone: React.FC = () => {
 
     let sid = sessionId;
     if (!sid) {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_API}api/auth/session`);
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_API.replace(/\/$/, '')}/api/auth/session`);
       sid = res.data.session_id;
       setSessionId(sid!);
     }
@@ -30,7 +30,7 @@ export const DropZone: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API}api/upload/`,
+        `${import.meta.env.VITE_BACKEND_API.replace(/\/$/, '')}/api/upload/`,
         formData,
         {
           onUploadProgress: (e) => {

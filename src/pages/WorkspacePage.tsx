@@ -9,42 +9,45 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const WorkspacePage: React.FC = () => {
   const { activeTab, setActiveTab, uploadedFile, reset } = useAppStore();
+  const [mobileView, setMobileView] = React.useState<'preview' | 'summary' | 'chat'>('summary');
   const fileSizeKb = uploadedFile ? (uploadedFile.size / 1024).toFixed(1) : '0';
 
   return (
-    <div className="h-[calc(100vh-56px)] flex flex-col bg-[#08080c] overflow-hidden relative">
+    <div className="h-[calc(100vh-48px)] md:h-[calc(100vh-56px)] flex flex-col bg-[#08080c] overflow-hidden relative">
       <div className="ambient opacity-20" />
 
-      {/* Top command bar - Very compact */}
-      <div className="flex-shrink-0 h-11 border-b border-white/[0.08] px-5 flex items-center justify-between bg-white/[0.01] backdrop-blur-xl relative z-20">
+      {/* Top command bar - Responsive */}
+      <div className="flex-shrink-0 h-auto min-h-[44px] md:h-11 border-b border-white/[0.08] px-3 md:px-5 py-2 md:py-0 flex flex-wrap items-center justify-between gap-3 bg-white/[0.01] backdrop-blur-xl relative z-20">
         {/* File info */}
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded-md bg-white/[0.03] border border-white/[0.08] flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-white/[0.03] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
             <FileText className="w-3.5 h-3.5 text-slate-500" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-medium text-white/90 truncate max-w-[240px] tracking-tight">{uploadedFile?.name}</span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] md:text-[11px] font-medium text-white/90 truncate max-w-[120px] sm:max-w-[240px] tracking-tight">{uploadedFile?.name}</span>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] text-slate-600 font-medium tracking-widest uppercase">{fileSizeKb} KB</span>
+              <span className="text-[8px] text-slate-600 font-medium tracking-widest uppercase">{fileSizeKb} KB</span>
               <div className="w-0.5 h-0.5 rounded-full bg-white/10" />
               <span className="text-emerald-500/80 text-[8px] font-bold tracking-widest uppercase">NODE ACTIVE</span>
             </div>
           </div>
         </div>
 
-        {/* Tabs - Smaller */}
-        <div className="flex items-center bg-black/40 border border-white/[0.05] rounded-lg p-0.5 backdrop-blur-md">
+        {/* Tabs - Main Navigation */}
+        <div className="flex items-center bg-black/40 border border-white/[0.05] rounded-lg p-0.5 backdrop-blur-md order-3 sm:order-none w-full sm:w-auto">
           <TabBtn
             active={activeTab === 'summary'}
             onClick={() => setActiveTab('summary')}
             icon={<LayoutDashboard className="w-3 h-3" />}
             label="Workspace"
+            className="flex-1 sm:flex-none"
           />
           <TabBtn
             active={activeTab === 'challenge'}
             onClick={() => setActiveTab('challenge')}
             icon={<Brain className="w-3 h-3" />}
             label="Lab"
+            className="flex-1 sm:flex-none"
           />
         </div>
 
@@ -54,7 +57,7 @@ export const WorkspacePage: React.FC = () => {
             whileHover={{ y: -1 }}
             whileTap={{ y: 0 }}
             onClick={reset} 
-            className="px-3 py-1 text-[10px] font-medium text-slate-500 border border-white/[0.08] rounded-md hover:text-white hover:bg-white/[0.02] transition-all"
+            className="px-2.5 py-1 text-[9px] md:text-[10px] font-medium text-slate-500 border border-white/[0.08] rounded-md hover:text-white hover:bg-white/[0.02] transition-all"
           >
             New Session
           </motion.button>
@@ -63,6 +66,26 @@ export const WorkspacePage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Sub-tabs for mobile Workspace view */}
+      {activeTab === 'summary' && (
+        <div className="lg:hidden flex-shrink-0 h-9 border-b border-white/[0.04] bg-black/20 flex items-center px-4 gap-4 overflow-x-auto scroll-none">
+          {[
+            { id: 'preview', label: 'Preview' },
+            { id: 'summary', label: 'Analysis' },
+            { id: 'chat', label: 'Interrogate' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setMobileView(tab.id as any)}
+              className={`text-[9px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap
+                ${mobileView === tab.id ? 'text-emerald-500' : 'text-slate-600'}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Main content */}
       <div className="flex-1 overflow-hidden p-2 relative z-10">
@@ -74,18 +97,28 @@ export const WorkspacePage: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="h-full grid grid-cols-[1fr_1.3fr_0.9fr] gap-2"
+              className="h-full"
             >
-              <PDFPreview />
-              <SummaryPanel />
-              <ChatPanel />
+              {/* Desktop Grid Layout */}
+              <div className="hidden lg:grid h-full grid-cols-[1fr_1.3fr_0.9fr] gap-2">
+                <PDFPreview />
+                <SummaryPanel />
+                <ChatPanel />
+              </div>
+
+              {/* Mobile/Tablet Tabbed Layout */}
+              <div className="lg:hidden h-full">
+                {mobileView === 'preview' && <PDFPreview />}
+                {mobileView === 'summary' && <SummaryPanel />}
+                {mobileView === 'chat' && <ChatPanel />}
+              </div>
             </motion.div>
           ) : (
             <motion.div
               key="challenge"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="h-full overflow-y-auto scroll p-6"
+              className="h-full overflow-y-auto scroll p-4 md:p-6"
             >
               <div className="max-w-3xl mx-auto">
                 <ChallengePanel />
@@ -99,13 +132,13 @@ export const WorkspacePage: React.FC = () => {
       <div className="flex-shrink-0 h-6 border-t border-white/[0.05] px-5 flex items-center justify-between
                       text-[8px] font-medium uppercase tracking-[0.4em] text-slate-700 bg-black/40 relative z-20">
         <div className="flex items-center gap-4">
-          <span>GROQ-Llama-3.1</span>
+          <span className="hidden sm:inline">GROQ-Llama-3.1</span>
           <span className="opacity-40 tracking-widest">LATENCY: 124MS</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <div className="w-1 h-1 bg-emerald-500/40 rounded-full animate-pulse" />
-            <span className="opacity-60 font-bold">SECURE LINK</span>
+            <span className="opacity-60 font-bold hidden sm:inline">SECURE LINK</span>
           </div>
           <span className="opacity-20 italic">v1.0.4</span>
         </div>
@@ -116,17 +149,17 @@ export const WorkspacePage: React.FC = () => {
 };
 
 const TabBtn = ({
-  active, onClick, icon, label
-}: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) => (
+  active, onClick, icon, label, className = ''
+}: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; className?: string }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-1.5 px-4 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all duration-200
+    className={`flex items-center justify-center gap-1.5 px-3 md:px-4 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest transition-all duration-200 ${className}
       ${active
         ? 'bg-white/[0.05] text-white border border-white/[0.08]'
         : 'text-slate-600 hover:text-slate-400'
       }`}
   >
     {icon}
-    {label}
+    <span className="hidden xs:inline">{label}</span>
   </button>
 );

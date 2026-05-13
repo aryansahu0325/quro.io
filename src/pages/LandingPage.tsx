@@ -179,16 +179,16 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Background Elements */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {/* Left Side Elements */}
-        <div className="absolute left-[4%] top-[5%] space-y-12">
+        {/* Left Side Elements - Hidden on small screens */}
+        <div className="hidden lg:block absolute left-[4%] top-[5%] space-y-12">
           <TerminalCard delay={0.2} title="Compiler.sys" />
           <div className="ml-8">
             <MonitorCard delay={0.5} />
           </div>
         </div>
 
-        {/* Right Side Elements */}
-        <div className="absolute right-[4%] top-[12%] space-y-12">
+        {/* Right Side Elements - Hidden on small screens */}
+        <div className="hidden lg:block absolute right-[4%] top-[12%] space-y-12">
           <TerminalCard delay={0.3} title="Vector.Link" className="!w-56" />
           <div className="mr-8">
             <motion.div
@@ -207,10 +207,10 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
         
-        {/* Central Saturn Rings */}
+        {/* Central Saturn Rings - Scaled for mobile */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-32">
-          <SaturnRing className="opacity-40" size="w-[1000px]" duration={60} />
-          <SaturnRing className="opacity-20" size="w-[1200px]" duration={90} color="indigo" />
+          <SaturnRing className="opacity-40 scale-50 md:scale-75 lg:scale-100" size="w-[1000px]" duration={60} />
+          <SaturnRing className="opacity-20 scale-50 md:scale-75 lg:scale-100" size="w-[1200px]" duration={90} color="indigo" />
         </div>
 
         {/* Neural Network background particles */}
@@ -232,8 +232,8 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex flex-col items-center pt-12 px-6 pb-16 text-center z-10">
-        <div className="max-w-3xl mx-auto space-y-12">
+      <section className="relative min-h-[60vh] flex flex-col items-center pt-8 md:pt-12 px-6 pb-16 text-center z-10">
+        <div className="max-w-3xl mx-auto space-y-8 md:space-y-12">
           {/* Status chip */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -252,7 +252,7 @@ export const LandingPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-4xl md:text-6xl font-medium text-white tracking-tight leading-[1.1]"
+              className="text-4xl md:text-5xl lg:text-6xl font-medium text-white tracking-tight leading-[1.1]"
             >
               Knowledge <br />
               <span className="grad italic relative inline-block">
@@ -276,10 +276,10 @@ export const LandingPage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="relative max-w-xl mx-auto"
+            className="relative max-w-xl mx-auto w-full"
           >
             <div className="glass-card p-1 shadow-2xl shadow-emerald-500/5">
-              <div className="glass border-dashed border-white/5 bg-[#0a0a0f]/40 p-12">
+              <div className="glass border-dashed border-white/5 bg-[#0a0a0f]/40 p-6 md:p-12">
                 <DropZone />
               </div>
             </div>
@@ -287,14 +287,14 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-20">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-20 hidden md:block">
           <div className="w-px h-12 bg-gradient-to-b from-emerald-500 to-transparent" />
         </div>
       </section>
 
       {/* Stats Section */}
       <section className="border-y border-white/[0.05] bg-white/[0.01] relative z-10">
-        <div className="max-w-5xl mx-auto px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-5xl mx-auto px-6 py-10 md:py-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {[
             { label: 'Neural Nodes', value: '12,408', icon: Layers },
             { label: 'Avg Latency', value: '0.08ms', icon: Zap },
@@ -321,15 +321,15 @@ export const LandingPage: React.FC = () => {
       {/* Capabilities */}
       <section className="py-16 px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeUp()} className="mb-20 space-y-4">
+          <motion.div {...fadeUp()} className="mb-12 md:mb-20 space-y-4 text-center md:text-left">
             <span className="text-emerald-500 font-bold text-[9px] uppercase tracking-[0.5em]">Capabilities</span>
-            <h2 className="text-3xl font-medium text-white tracking-tight">Intelligence Stack.</h2>
-            <p className="text-slate-500 max-w-sm text-[11px] leading-relaxed font-medium">
+            <h2 className="text-2xl md:text-3xl font-medium text-white tracking-tight">Intelligence Stack.</h2>
+            <p className="text-slate-500 max-w-sm mx-auto md:mx-0 text-[11px] leading-relaxed font-medium">
               Proprietary RAG protocols for mission-critical research and data synthesis.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { icon: Binary, title: 'Semantic Mapping', desc: 'Identify relationships across billion-scale research nodes.' },
               { icon: Search, title: 'Grounded RAG', desc: 'Zero-hallucination responses through multi-stage retrieval.' },
@@ -338,7 +338,7 @@ export const LandingPage: React.FC = () => {
               <motion.div
                 key={cap.title}
                 {...fadeUp(i * 0.1)}
-                className="glass p-8 space-y-6 cursor-default hover:bg-white/[0.02] transition-all group"
+                className="glass p-6 md:p-8 space-y-6 cursor-default hover:bg-white/[0.02] transition-all group"
               >
                 <div className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/[0.05] flex items-center justify-center group-hover:border-emerald-500/20 transition-all">
                   <cap.icon className="w-4 h-4 text-emerald-500/50 group-hover:text-emerald-500" />

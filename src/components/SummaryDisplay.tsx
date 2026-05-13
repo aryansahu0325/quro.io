@@ -50,7 +50,7 @@ export default function SummaryDisplay({ summary, fileName, fileContent, isGener
       formData.append("question", userQuestion);
       formData.append("fileContent", fileContent);
 
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API}api/assistant/ask`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API.replace(/\/$/, '')}/api/assistant/ask`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 

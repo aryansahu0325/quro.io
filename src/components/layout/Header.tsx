@@ -24,38 +24,38 @@ export const Header: React.FC = () => {
           <span className="text-sm font-semibold text-white tracking-tight">
             quro<span className="text-emerald-500">.</span>io
           </span>
-          <span className="tag hidden sm:inline-flex">
+          <span className="tag hidden lg:inline-flex">
             <span className="dot-live" />
             v4.0
           </span>
         </motion.div>
 
-        {/* Nav links */}
-        <div className="hidden md:flex items-center gap-6 text-[11px] font-medium text-slate-500">
+        {/* Nav links - hidden on mobile/tablet */}
+        <div className="hidden lg:flex items-center gap-6 text-[11px] font-medium text-slate-500">
           <a href="#" className="hover:text-slate-300 transition-colors">Docs</a>
           <a href="#" className="hover:text-slate-300 transition-colors">API</a>
           <a href="#" className="hover:text-slate-300 transition-colors">Pricing</a>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2">
           {uploadedFile && (
-            <button onClick={reset} className="btn gap-1.5 hidden sm:inline-flex">
+            <button onClick={reset} className="btn gap-1.5 hidden md:inline-flex">
               <RefreshCw className="w-3 h-3" />
               New file
             </button>
           )}
-          <div className="w-px h-4 bg-white/[0.08] hidden sm:block" />
+          <div className="w-px h-4 bg-white/[0.08] hidden md:block" />
           <button
             onClick={() => setIsModalOpen(true)}
-            className="btn"
+            className="btn !px-2 md:!px-3"
           >
             <Lock className="w-3 h-3" />
-            Sign in
+            <span className="hidden xs:inline">Sign in</span>
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="btn-solid"
+            className="btn-solid !px-2 md:!px-3"
           >
             Deploy
           </button>

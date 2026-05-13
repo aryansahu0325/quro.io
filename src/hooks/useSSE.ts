@@ -29,12 +29,9 @@ export const useSSE = () => {
       formData.append('question', question);
       formData.append('session_id', sessionId);
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_API}api/assistant/ask`, {
-        method: 'POST',
-        body: formData,
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API.replace(/\/$/, '')}/api/assistant/ask`, formData, {
+        responseType: 'stream',
       });
-
-      if (!response.body) return;
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();

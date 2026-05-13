@@ -19,9 +19,9 @@ export const DataStreamPipeline: React.FC = () => {
           <p className="text-[10px] text-slate-600 max-w-sm mx-auto uppercase tracking-[0.2em] font-bold">Autonomous data-flow orchestration</p>
         </div>
 
-        <div className="relative py-20">
-          {/* THE PIPE STRUCTURE */}
-          <div className="absolute top-1/2 left-0 w-full h-12 -translate-y-1/2 rounded-full overflow-hidden">
+        <div className="relative py-12 md:py-20">
+          {/* THE PIPE STRUCTURE - Hidden on mobile to prevent clutter */}
+          <div className="absolute top-1/2 left-0 w-full h-12 -translate-y-1/2 rounded-full overflow-hidden hidden md:block">
             {/* Glass Pipe Body */}
             <motion.div 
               animate={{ opacity: [0.02, 0.05, 0.02] }}
@@ -55,7 +55,7 @@ export const DataStreamPipeline: React.FC = () => {
           </div>
 
           {/* HUB NODES (Processing Units) */}
-          <div className="relative flex justify-between items-center h-40 px-12">
+          <div className="relative flex flex-col md:flex-row justify-between items-center gap-20 md:gap-0 md:h-40 px-6 md:px-12">
             {[
               { icon: Share2, label: 'INGRESS', color: 'emerald', detail: '1.2GB/s' },
               { icon: Database, label: 'VECTOR', color: 'teal', detail: '1536-D' },
@@ -66,10 +66,10 @@ export const DataStreamPipeline: React.FC = () => {
                 {/* Node Housing */}
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
-                  className="w-24 h-24 glass !bg-[#0a0a0f] border-white/10 rounded-full flex items-center justify-center relative z-20 shadow-2xl group cursor-default"
+                  className="w-20 h-20 md:w-24 md:h-24 glass !bg-[#0a0a0f] border-white/10 rounded-full flex items-center justify-center relative z-20 shadow-2xl group cursor-default"
                 >
                   <div className="absolute inset-2 border border-dashed border-white/5 rounded-full animate-spin-slow" />
-                  <node.icon className={`w-8 h-8 text-${node.color}-500/40 group-hover:text-${node.color}-400 transition-colors duration-500`} />
+                  <node.icon className={`w-6 h-6 md:w-8 md:h-8 text-${node.color}-500/40 group-hover:text-${node.color}-400 transition-colors duration-500`} />
                   
                   {/* Internal Glow */}
                   <div className={`absolute inset-0 bg-${node.color}-500/5 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -84,14 +84,14 @@ export const DataStreamPipeline: React.FC = () => {
                 </div>
 
                 {/* Connection Ring */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/[0.03] rounded-full pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-32 md:h-32 border border-white/[0.03] rounded-full pointer-events-none" />
               </div>
             ))}
           </div>
         </div>
 
         {/* Live Grid Metrics */}
-        <div className="mt-48 grid grid-cols-2 md:grid-cols-4 gap-4 px-12">
+        <div className="mt-32 md:mt-48 grid grid-cols-2 md:grid-cols-4 gap-4 px-6 md:px-12">
           {[
             { label: 'Network Uptime', val: '99.998%', icon: Activity },
             { label: 'Processing Load', val: '14.2%', icon: Zap },
