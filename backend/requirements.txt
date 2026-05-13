@@ -1,8 +1,6 @@
 # CPU Optimized Dependencies (Railway/Cloud)
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.5.1+cpu
-torchaudio==2.5.1+cpu
-torchvision==0.20.1+cpu
 
 fastapi==0.116.1
 uvicorn==0.35.0
