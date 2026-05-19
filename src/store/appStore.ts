@@ -1,11 +1,19 @@
 import { create } from 'zustand';
+import { fetchSessions } from '../services/api';
+import type { PastSession } from '../services/api';
 
-interface Message {
+export interface Message {
   id: string;
   text: string;
   sender: 'user' | 'ai';
   timestamp: Date;
   isStreaming?: boolean;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  api_key: string;
 }
 
 interface Summary {
@@ -19,36 +27,75 @@ interface Summary {
 
 interface AppState {
   sessionId: string | null;
+  sessionDbId: string | null;           // DB id of the current DocumentSession
   uploadedFile: File | null;
+  pendingFile: File | null;             // File queued while auth modal is open
   isProcessing: boolean;
   summary: Summary | null;
   messages: Message[];
-  activeTab: 'summary' | 'challenge';
+  activeTab: 'summary' | 'chat';
   isModalOpen: boolean;
-  
+  showApiDocs: boolean;
+  showSessionHistory: boolean;
+  token: string | null;
+  user: UserProfile | null;
+  guestUploadCount: number;
+  pastSessions: PastSession[];
+  isLoadingSessions: boolean;
+
   // Actions
   setSessionId: (id: string) => void;
+  setSessionDbId: (id: string | null) => void;
   setUploadedFile: (file: File | null) => void;
+  setPendingFile: (file: File | null) => void;
   setIsProcessing: (status: boolean) => void;
   setSummary: (summary: Summary | null) => void;
   addMessage: (message: Message) => void;
   updateLastMessage: (text: string, isStreaming?: boolean) => void;
-  setActiveTab: (tab: 'summary' | 'challenge') => void;
+  setActiveTab: (tab: 'summary' | 'chat') => void;
   setIsModalOpen: (status: boolean) => void;
+  setShowApiDocs: (status: boolean) => void;
+  setShowSessionHistory: (status: boolean) => void;
+  setToken: (token: string | null) => void;
+  setUser: (user: UserProfile | null) => void;
+  incrementGuestUpload: () => void;
+  loadPastSessions: () => Promise<void>;
+  removeSession: (id: string) => void;
+  logout: () => void;
   reset: () => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
+function loadStoredUser(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export const useAppStore = create<AppState>((set, get) => ({
   sessionId: null,
+  sessionDbId: null,
   uploadedFile: null,
+  pendingFile: null,
   isProcessing: false,
   summary: null,
   messages: [],
   activeTab: 'summary',
   isModalOpen: false,
- 
+  showApiDocs: false,
+  showSessionHistory: false,
+  token: localStorage.getItem('token'),
+  user: loadStoredUser(),
+  guestUploadCount: parseInt(localStorage.getItem('guestUploadCount') || '0'),
+  pastSessions: [],
+  isLoadingSessions: false,
+
   setSessionId: (id) => set({ sessionId: id }),
+  setSessionDbId: (id) => set({ sessionDbId: id }),
   setUploadedFile: (file) => set({ uploadedFile: file }),
+  setPendingFile: (file) => set({ pendingFile: file }),
   setIsProcessing: (status) => set({ isProcessing: status }),
   setSummary: (summary) => set({ summary }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
@@ -59,7 +106,7 @@ export const useAppStore = create<AppState>((set) => ({
       updatedMessages[updatedMessages.length - 1] = {
         ...lastMessage,
         text: lastMessage.isStreaming ? lastMessage.text + text : text,
-        isStreaming: isStreaming ?? lastMessage.isStreaming
+        isStreaming: isStreaming ?? lastMessage.isStreaming,
       };
       return { messages: updatedMessages };
     }
@@ -67,11 +114,64 @@ export const useAppStore = create<AppState>((set) => ({
   }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setIsModalOpen: (status) => set({ isModalOpen: status }),
+  setShowApiDocs: (status) => set({ showApiDocs: status }),
+  setShowSessionHistory: (status) => set({ showSessionHistory: status }),
+  setToken: (token) => {
+    if (token) localStorage.setItem('token', token);
+    else localStorage.removeItem('token');
+    set({ token });
+  },
+  setUser: (user) => {
+    if (user) localStorage.setItem('user', JSON.stringify(user));
+    else localStorage.removeItem('user');
+    set({ user });
+  },
+  incrementGuestUpload: () => set((state) => {
+    const newCount = state.guestUploadCount + 1;
+    localStorage.setItem('guestUploadCount', newCount.toString());
+    return { guestUploadCount: newCount };
+  }),
+  loadPastSessions: async () => {
+    const { token } = get();
+    if (!token) return;
+    set({ isLoadingSessions: true });
+    try {
+      const data = await fetchSessions();
+      set({ pastSessions: data.sessions });
+    } catch (e) {
+      console.error('Failed to load sessions:', e);
+    } finally {
+      set({ isLoadingSessions: false });
+    }
+  },
+  removeSession: (id) =>
+    set((state) => ({ pastSessions: state.pastSessions.filter((s) => s.id !== id) })),
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    set({
+      token: null,
+      user: null,
+      uploadedFile: null,
+      pendingFile: null,
+      isProcessing: false,
+      summary: null,
+      messages: [],
+      sessionId: null,
+      sessionDbId: null,
+      activeTab: 'summary',
+      pastSessions: [],
+      showSessionHistory: false,
+    });
+  },
   reset: () => set({
     uploadedFile: null,
+    pendingFile: null,
     isProcessing: false,
     summary: null,
     messages: [],
-    activeTab: 'summary'
+    activeTab: 'summary',
+    sessionId: null,
+    sessionDbId: null,
   }),
 }));

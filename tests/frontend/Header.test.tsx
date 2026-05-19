@@ -20,7 +20,7 @@ describe('Header', () => {
       </BrowserRouter>
     );
     expect(screen.getByText(/quro/i)).toBeInTheDocument();
-    expect(screen.getByText(/\.io/i)).toBeInTheDocument();
+    expect(screen.getByText(/quro/i).textContent).toMatch(/quro\.io/i);
   });
 
   it('renders the sign in button', () => {

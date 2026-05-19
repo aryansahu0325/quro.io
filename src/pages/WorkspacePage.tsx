@@ -2,13 +2,12 @@ import React from 'react';
 import { useAppStore } from '../store/appStore';
 import { SummaryPanel } from '../components/summary/SummaryPanel';
 import { ChatPanel } from '../components/chat/ChatPanel';
-import { ChallengePanel } from '../components/challenge/ChallengePanel';
 import { PDFPreview } from '../components/workspace/PDFPreview';
 import { FileText, Brain, LayoutDashboard, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const WorkspacePage: React.FC = () => {
-  const { activeTab, setActiveTab, uploadedFile, reset } = useAppStore();
+  const { activeTab, setActiveTab, uploadedFile, reset, sessionDbId, user } = useAppStore();
   const [mobileView, setMobileView] = React.useState<'preview' | 'summary' | 'chat'>('summary');
   const fileSizeKb = uploadedFile ? (uploadedFile.size / 1024).toFixed(1) : '0';
 
@@ -43,10 +42,10 @@ export const WorkspacePage: React.FC = () => {
             className="flex-1 sm:flex-none"
           />
           <TabBtn
-            active={activeTab === 'challenge'}
-            onClick={() => setActiveTab('challenge')}
+            active={activeTab === 'chat'}
+            onClick={() => setActiveTab('chat')}
             icon={<Brain className="w-3 h-3" />}
-            label="Lab"
+            label="Chat"
             className="flex-1 sm:flex-none"
           />
         </div>
@@ -66,6 +65,22 @@ export const WorkspacePage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Guest Session Warn Strip */}
+      {!user && (
+        <div className="flex-shrink-0 bg-amber-500/5 border-b border-amber-500/10 px-5 py-1.5 flex items-center justify-between text-[9px] text-amber-200/60 font-medium relative z-20">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            <span>You are using a Guest Session. Your chat history and document analysis will not be saved.</span>
+          </div>
+          <button
+            onClick={() => useAppStore.getState().setIsModalOpen(true)}
+            className="text-amber-400 hover:text-amber-300 font-bold uppercase tracking-wider text-[8px] transition-colors"
+          >
+            Sign in to persist session &rarr;
+          </button>
+        </div>
+      )}
 
       {/* Sub-tabs for mobile Workspace view */}
       {activeTab === 'summary' && (
@@ -115,13 +130,17 @@ export const WorkspacePage: React.FC = () => {
             </motion.div>
           ) : (
             <motion.div
-              key="challenge"
+              key="chat-tab"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="h-full overflow-y-auto scroll p-4 md:p-6"
+              className="h-full p-2"
             >
-              <div className="max-w-3xl mx-auto">
-                <ChallengePanel />
+              <div className="h-full hidden lg:grid grid-cols-[1fr_1fr] gap-2">
+                <PDFPreview />
+                <ChatPanel />
+              </div>
+              <div className="lg:hidden h-full">
+                 <ChatPanel />
               </div>
             </motion.div>
           )}
@@ -134,6 +153,12 @@ export const WorkspacePage: React.FC = () => {
         <div className="flex items-center gap-4">
           <span className="hidden sm:inline">GROQ-Llama-3.1</span>
           <span className="opacity-40 tracking-widest">LATENCY: 124MS</span>
+          <div className="w-px h-2.5 bg-white/5" />
+          {sessionDbId ? (
+            <span className="text-emerald-500 font-bold tracking-widest">● SESSION SAVED</span>
+          ) : (
+            <span className="text-amber-500/80 font-bold tracking-widest">● EPHEMERAL SESSION</span>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">

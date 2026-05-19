@@ -179,16 +179,16 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Background Elements */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {/* Left Side Elements - Hidden on small screens */}
-        <div className="hidden lg:block absolute left-[4%] top-[5%] space-y-12">
+        {/* Left Side Elements - Only on extra large screens */}
+        <div className="hidden xl:block absolute left-[4%] top-[5%] space-y-12">
           <TerminalCard delay={0.2} title="Compiler.sys" />
           <div className="ml-8">
             <MonitorCard delay={0.5} />
           </div>
         </div>
 
-        {/* Right Side Elements - Hidden on small screens */}
-        <div className="hidden lg:block absolute right-[4%] top-[12%] space-y-12">
+        {/* Right Side Elements - Only on extra large screens */}
+        <div className="hidden xl:block absolute right-[4%] top-[12%] space-y-12">
           <TerminalCard delay={0.3} title="Vector.Link" className="!w-56" />
           <div className="mr-8">
             <motion.div

@@ -5,13 +5,40 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const DropZone: React.FC = () => {
-  const { setUploadedFile, setIsProcessing, setSummary, setSessionId, sessionId } = useAppStore();
+  const {
+    setUploadedFile,
+    setIsProcessing,
+    setSummary,
+    setSessionId,
+    sessionId,
+    user,
+    guestUploadCount,
+    incrementGuestUpload,
+    setIsModalOpen,
+    token,
+    pendingFile,
+    setPendingFile
+  } = useAppStore();
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  React.useEffect(() => {
+    if (user && pendingFile) {
+      const fileToUpload = pendingFile;
+      setPendingFile(null);
+      onUpload(fileToUpload);
+    }
+  }, [user, pendingFile]);
+
   const onUpload = async (file: File) => {
+    if (!user && guestUploadCount >= 1) {
+      setPendingFile(file);
+      setIsModalOpen(true);
+      return;
+    }
+
     setFileName(file.name);
     setIsUploading(true);
     setUploadedFile(file);
@@ -29,10 +56,16 @@ export const DropZone: React.FC = () => {
     formData.append('session_id', sid!);
 
     try {
+      const headers: any = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_API.replace(/\/$/, '')}/api/upload/`,
         formData,
         {
+          headers,
           onUploadProgress: (e) => {
             const pct = Math.round((e.loaded * 100) / (e.total || 1));
             setProgress(pct);
@@ -40,9 +73,19 @@ export const DropZone: React.FC = () => {
         }
       );
       setSummary(response.data.summary);
-    } catch (err) {
+      if (response.data.session_db_id) {
+        useAppStore.getState().setSessionDbId(response.data.session_db_id);
+      }
+      if (!user) {
+        incrementGuestUpload();
+      }
+    } catch (err: any) {
       console.error('Upload failed:', err);
-      alert('Upload failed. Please check the backend connection.');
+      if (err.response?.status === 403) {
+        setIsModalOpen(true);
+      } else {
+        alert('Upload failed. Please check the backend connection.');
+      }
       setUploadedFile(null);
       setFileName(null);
     } finally {
@@ -78,7 +121,7 @@ export const DropZone: React.FC = () => {
       <input
         id="file-upload"
         type="file"
-        className="hidden"
+        className="absolute w-px h-px opacity-0 overflow-hidden"
         accept=".pdf,.txt"
         onChange={(e) => e.target.files?.[0] && onUpload(e.target.files[0])}
       />
