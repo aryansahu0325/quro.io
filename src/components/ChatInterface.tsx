@@ -1,7 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
+const renderMixedText = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      return <BlockMath key={index} math={part.slice(2, -2)} />;
+    }
+    if (part.startsWith('$') && part.endsWith('$')) {
+      return <InlineMath key={index} math={part.slice(1, -1)} />;
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
 interface Message {
   id: number;
   text: string;
@@ -142,7 +157,9 @@ const handleSendMessage = async () => {
                     : 'bg-gray-700 text-gray-200'
                 }`}
               >
-                <p className="text-sm leading-relaxed">{message.text}</p>
+                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {message.sender === 'ai' ? renderMixedText(message.text) : message.text}
+                </div>
                 <p
                   className={`text-xs mt-1 ${
                     message.sender === 'user' ? 'text-blue-100' : 'text-gray-400'

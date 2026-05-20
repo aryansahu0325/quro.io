@@ -1,84 +1,89 @@
-import React from 'react';
-import { Cpu, Github, Twitter, Mail } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Cpu } from 'lucide-react';
+import { TermsModal, PrivacyModal, SecurityModal, StatusModal } from './FooterModals';
 
 export const Footer: React.FC = () => {
+  const [activeModal, setActiveModal] = useState<'terms' | 'privacy' | 'security' | 'status' | null>(null);
+
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="border-t border-white/[0.05] bg-[#08080c] relative overflow-hidden">
-      {/* MASSIVE BACKGROUND TEXT */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        <motion.h2 
-          initial={{ opacity: 0, y: 100 }}
-          whileInView={{ opacity: 0.03, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="text-[22vw] font-black text-white tracking-tighter select-none leading-none translate-y-20 italic"
-        >
-          quro.io
-        </motion.h2>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-20 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
-
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1 space-y-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <Cpu className="w-4 h-4 text-black" />
+    <>
+      <footer className="w-full border-t border-white/[0.06] bg-[#08080c] mt-auto">
+        <div className="max-w-[1200px] mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+            
+            {/* Brand Column */}
+            <div className="col-span-1 md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-emerald-500 rounded-md flex items-center justify-center">
+                  <Cpu className="w-3.5 h-3.5 text-black" />
+                </div>
+                <span className="text-sm font-bold text-white tracking-tight">
+                  quro<span className="text-emerald-500">.</span>io
+                </span>
               </div>
-              <span className="text-base font-bold text-white tracking-tighter">quro<span className="text-emerald-500">.</span>io</span>
+              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                The industry-standard platform for ultra-fast, secure, and infinitely scalable neural document intelligence.
+              </p>
             </div>
-            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
-              Industrial-grade neural architecture for mission-critical research intelligence and semantic synthesis.
-            </p>
-            <div className="flex items-center gap-3">
-              {[Github, Twitter, Mail].map((Icon, i) => (
-                <a key={i} href="#"
-                  className="w-8 h-8 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center
-                             text-slate-600 hover:text-emerald-500 hover:border-emerald-500/30 transition-all duration-300">
-                  <Icon className="w-3.5 h-3.5" />
-                </a>
-              ))}
-            </div>
-          </div>
 
-          {/* Links */}
-          {[
-            { title: 'Protocol', links: ['Semantic Search', 'Vector Mapping', 'Neural Link', 'RAG Pipeline'] },
-            { title: 'Infrastructure', links: ['Documentation', 'Grid Status', 'Latency API', 'Security'] },
-            { title: 'Organization', links: ['About', 'Intelligence', 'Careers', 'Contact'] },
-          ].map(({ title, links }) => (
-            <div key={title} className="space-y-6">
-              <h4 className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">{title}</h4>
+            {/* Platform Column */}
+            <div className="col-span-1">
+              <h4 className="text-white text-[13px] font-semibold mb-4">Platform</h4>
               <ul className="space-y-3">
-                {links.map(link => (
-                  <li key={link}>
-                    <a href="#" className="text-[11px] text-slate-500 hover:text-white transition-all duration-200 font-medium">
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Vector Workspace</a></li>
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">REST API Docs</a></li>
+                <li><button onClick={() => setActiveModal('security')} className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Security Architecture</button></li>
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Enterprise Pricing</a></li>
               </ul>
             </div>
-          ))}
-        </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-4
-                        text-[9px] text-slate-700 font-black tracking-widest uppercase">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40 animate-pulse" />
-            <span>Grid Operational · US-EAST-01</span>
+            {/* Resources Column */}
+            <div className="col-span-1">
+              <h4 className="text-white text-[13px] font-semibold mb-4">Legal & Compliance</h4>
+              <ul className="space-y-3">
+                <li><button onClick={() => setActiveModal('terms')} className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => setActiveModal('privacy')} className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Privacy Policy</button></li>
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Cookie Preferences</a></li>
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Help Center</a></li>
+              </ul>
+            </div>
+
+            {/* System Column */}
+            <div className="col-span-1">
+              <h4 className="text-white text-[13px] font-semibold mb-4">System</h4>
+              <ul className="space-y-3">
+                <li>
+                  <button onClick={() => setActiveModal('status')} className="text-xs text-slate-500 hover:text-emerald-400 transition-colors flex items-center gap-2 group">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:animate-pulse"></span>
+                    Live Status
+                  </button>
+                </li>
+                <li><a href="#" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">Developer Portal</a></li>
+                <li><a href="https://github.com" target="_blank" rel="noreferrer" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">GitHub Repository</a></li>
+              </ul>
+            </div>
+
           </div>
-          <span className="opacity-40">© 2026 Quro Neural Systems</span>
-          <div className="flex items-center gap-6">
-            {['Privacy', 'Terms', 'Legal'].map(l => (
-              <a key={l} href="#" className="hover:text-slate-400 transition-colors">{l}</a>
-            ))}
+
+          <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[11px] text-slate-600">
+              &copy; {currentYear} Quro AI Platform. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6 text-[11px] text-slate-600 font-mono">
+              <span>SYS.OK</span>
+              <span>AES-256</span>
+              <span>v4.0.0</span>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+
+      <TermsModal isOpen={activeModal === 'terms'} onClose={() => setActiveModal(null)} />
+      <PrivacyModal isOpen={activeModal === 'privacy'} onClose={() => setActiveModal(null)} />
+      <SecurityModal isOpen={activeModal === 'security'} onClose={() => setActiveModal(null)} />
+      <StatusModal isOpen={activeModal === 'status'} onClose={() => setActiveModal(null)} />
+    </>
   );
 };

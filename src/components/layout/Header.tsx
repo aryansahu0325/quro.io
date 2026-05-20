@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Cpu, RefreshCw, History, LogOut, ChevronDown, User, Key } from 'lucide-react';
+import { Cpu, RefreshCw, History, LogOut, ChevronDown, User, Key, Shield } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -107,6 +107,18 @@ export const Header: React.FC = () => {
 
                     {/* Menu items */}
                     <div className="p-1">
+                      {user.is_admin && (
+                        <button
+                          onClick={() => { useAppStore.getState().setShowAdminPanel(true); setDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-emerald-500/10 transition-colors text-left group mb-1"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-400 transition-colors" />
+                          <span className="text-[11px] text-emerald-400 group-hover:text-emerald-300 transition-colors font-medium">
+                            Admin Center
+                          </span>
+                        </button>
+                      )}
+                      
                       <button
                         onClick={handleHistoryToggle}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-left group"

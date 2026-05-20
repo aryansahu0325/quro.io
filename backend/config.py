@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # Neon/PostgreSQL Settings
     DATABASE_URL: str
     
+    # Email Settings (Resend API)
+    RESEND_API_KEY: Optional[str] = None
+    
     # Embedding Settings
     EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
     RERANK_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"

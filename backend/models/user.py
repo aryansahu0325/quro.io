@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
 import datetime
@@ -13,6 +13,25 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     api_key = Column(String, unique=True, default=lambda: str(uuid.uuid4()))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    # Administration and Role-Based Access
+    is_admin = Column(Boolean, default=False)
+    
+    # Signup Verification Workflow
+    is_verified = Column(Boolean, default=False)
+    verification_otp = Column(String, nullable=True)
+    verification_otp_expires_at = Column(DateTime, nullable=True)
+    
+    # Passwordless OTP Login Workflow
+    login_otp = Column(String, nullable=True)
+    login_otp_expires_at = Column(DateTime, nullable=True)
+    
+    # Password Reset Workflow
+    reset_password_otp = Column(String, nullable=True)
+    reset_password_otp_expires_at = Column(DateTime, nullable=True)
+    
+    # OAuth Identities
+    google_id = Column(String, unique=True, index=True, nullable=True)
 
     # Relationships
     document_sessions = relationship("DocumentSession", back_populates="user", cascade="all, delete-orphan")

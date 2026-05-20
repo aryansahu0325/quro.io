@@ -3,7 +3,21 @@ import { useAppStore } from '../../store/appStore';
 import { Target, Zap, Binary, Image as ImageIcon, BookOpen, Share2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { InlineMath } from 'react-katex';
+import { InlineMath, BlockMath } from 'react-katex';
+
+const renderMixedText = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      return <BlockMath key={index} math={part.slice(2, -2)} />;
+    }
+    if (part.startsWith('$') && part.endsWith('$')) {
+      return <InlineMath key={index} math={part.slice(1, -1)} />;
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
 
 export const SummaryPanel: React.FC = () => {
   const { summary, isProcessing } = useAppStore();
@@ -103,8 +117,8 @@ export const SummaryPanel: React.FC = () => {
           <div className="space-y-2">
             {demoSummary.mathematical_insights?.map((item: string, i: number) => (
               <div key={i} className="bg-black/20 p-2 rounded border border-white/[0.03] overflow-x-auto overflow-y-hidden scroll">
-                <div className="text-amber-500/70 text-[10px]">
-                  <InlineMath math={item} />
+                <div className="text-amber-500/70 text-[10px] whitespace-pre-wrap">
+                  {renderMixedText(item)}
                 </div>
               </div>
             ))}

@@ -36,6 +36,7 @@ interface AppState {
   activeTab: 'summary' | 'chat';
   isModalOpen: boolean;
   showApiDocs: boolean;
+  showAdminPanel: boolean;
   showSessionHistory: boolean;
   token: string | null;
   user: UserProfile | null;
@@ -55,6 +56,7 @@ interface AppState {
   setActiveTab: (tab: 'summary' | 'chat') => void;
   setIsModalOpen: (status: boolean) => void;
   setShowApiDocs: (status: boolean) => void;
+  setShowAdminPanel: (status: boolean) => void;
   setShowSessionHistory: (status: boolean) => void;
   setToken: (token: string | null) => void;
   setUser: (user: UserProfile | null) => void;
@@ -85,6 +87,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeTab: 'summary',
   isModalOpen: false,
   showApiDocs: false,
+  showAdminPanel: false,
   showSessionHistory: false,
   token: localStorage.getItem('token'),
   user: loadStoredUser(),
@@ -115,6 +118,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
   setIsModalOpen: (status) => set({ isModalOpen: status }),
   setShowApiDocs: (status) => set({ showApiDocs: status }),
+  setShowAdminPanel: (status) => set({ showAdminPanel: status }),
   setShowSessionHistory: (status) => set({ showSessionHistory: status }),
   setToken: (token) => {
     if (token) localStorage.setItem('token', token);
