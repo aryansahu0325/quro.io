@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const {
-    uploadedFile, reset, setIsModalOpen, user, setShowApiDocs,
+    uploadedFiles, reset, setIsModalOpen, user, setShowApiDocs,
     showSessionHistory, setShowSessionHistory, logout, loadPastSessions,
   } = useAppStore();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-1.5 md:gap-2">
-          {uploadedFile && !useAppStore.getState().showApiDocs && (
+          {uploadedFiles.length > 0 && !useAppStore.getState().showApiDocs && (
             <button onClick={reset} className="btn gap-1.5 hidden md:inline-flex">
               <RefreshCw className="w-3 h-3" />
               New file

@@ -3,13 +3,15 @@ import { useAppStore } from '../store/appStore';
 import { SummaryPanel } from '../components/summary/SummaryPanel';
 import { ChatPanel } from '../components/chat/ChatPanel';
 import { PDFPreview } from '../components/workspace/PDFPreview';
-import { FileText, Brain, LayoutDashboard, Settings } from 'lucide-react';
+import { SynthesisPanel } from '../components/synthesis/SynthesisPanel';
+import { FileText, Brain, LayoutDashboard, Settings, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const WorkspacePage: React.FC = () => {
-  const { activeTab, setActiveTab, uploadedFile, reset, sessionDbId, user } = useAppStore();
+  const { activeTab, setActiveTab, uploadedFiles, documents, reset, sessionDbId, user } = useAppStore();
   const [mobileView, setMobileView] = React.useState<'preview' | 'summary' | 'chat'>('summary');
-  const fileSizeKb = uploadedFile ? (uploadedFile.size / 1024).toFixed(1) : '0';
+  const totalSize = uploadedFiles.reduce((acc, f) => acc + f.size, 0);
+  const fileSizeKb = (totalSize / 1024).toFixed(1);
 
   return (
     <div className="h-[calc(100vh-48px)] md:h-[calc(100vh-56px)] flex flex-col bg-[#08080c] overflow-hidden relative">
@@ -23,11 +25,15 @@ export const WorkspacePage: React.FC = () => {
             <FileText className="w-3.5 h-3.5 text-slate-500" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-[10px] md:text-[11px] font-medium text-white/90 truncate max-w-[120px] sm:max-w-[240px] tracking-tight">{uploadedFile?.name}</span>
+            <span className="text-[10px] md:text-[11px] font-medium text-white/90 truncate max-w-[120px] sm:max-w-[240px] tracking-tight">
+              {uploadedFiles.length === 1 ? uploadedFiles[0]?.name : `${uploadedFiles.length} Research Papers`}
+            </span>
             <div className="flex items-center gap-2">
               <span className="text-[8px] text-slate-600 font-medium tracking-widest uppercase">{fileSizeKb} KB</span>
               <div className="w-0.5 h-0.5 rounded-full bg-white/10" />
-              <span className="text-emerald-500/80 text-[8px] font-bold tracking-widest uppercase">NODE ACTIVE</span>
+              <span className="text-emerald-500/80 text-[8px] font-bold tracking-widest uppercase">
+                {uploadedFiles.length > 1 ? `${uploadedFiles.length} NODES ACTIVE` : 'NODE ACTIVE'}
+              </span>
             </div>
           </div>
         </div>
@@ -39,6 +45,13 @@ export const WorkspacePage: React.FC = () => {
             onClick={() => setActiveTab('summary')}
             icon={<LayoutDashboard className="w-3 h-3" />}
             label="Workspace"
+            className="flex-1 sm:flex-none"
+          />
+          <TabBtn
+            active={activeTab === 'synthesis'}
+            onClick={() => setActiveTab('synthesis')}
+            icon={<Sparkles className="w-3 h-3 text-emerald-400" />}
+            label="Synthesis"
             className="flex-1 sm:flex-none"
           />
           <TabBtn
@@ -127,6 +140,16 @@ export const WorkspacePage: React.FC = () => {
                 {mobileView === 'summary' && <SummaryPanel />}
                 {mobileView === 'chat' && <ChatPanel />}
               </div>
+            </motion.div>
+          ) : activeTab === 'synthesis' ? (
+            <motion.div
+              key="synthesis-tab"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="h-full"
+            >
+              <SynthesisPanel />
             </motion.div>
           ) : (
             <motion.div

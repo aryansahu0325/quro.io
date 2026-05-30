@@ -14,7 +14,7 @@ import { getCurrentUser } from './services/api';
 import { Footer } from './components/layout/Footer';
 
 function App() {
-  const { uploadedFile, showApiDocs, token, setUser, loadPastSessions } = useAppStore();
+  const { uploadedFiles, showApiDocs, token, setUser, loadPastSessions } = useAppStore();
 
   useEffect(() => {
     if (token) {
@@ -50,7 +50,7 @@ function App() {
         <AnimatePresence mode="wait">
           {showApiDocs ? (
             <ApiDocsPage key="apidocs" />
-          ) : uploadedFile ? (
+          ) : uploadedFiles.length > 0 ? (
             <WorkspacePage key="workspace" />
           ) : (
             <LandingPage key="landing" />

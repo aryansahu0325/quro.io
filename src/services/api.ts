@@ -174,6 +174,17 @@ export async function deleteUser(userId: string) {
   return data;
 }
 
+export async function sendBroadcastEmail(subject: string, htmlContent: string) {
+  const res = await fetch(`${BASE_URL}/api/admin/broadcast`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subject, html_content: htmlContent }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Failed to send broadcast');
+  return data;
+}
+
 // ─── Sessions ─────────────────────────────────────────────────────────────────
 
 export async function fetchSessions(skip = 0, limit = 50) {
@@ -218,21 +229,26 @@ export interface UserProfile {
 
 export interface PastSession {
   id: string;
+  created_at: string;
+  document_count: number;
+  filenames: string[];
+  message_count: number;
+  title: string;
+  db_ids: string[];
+}
+
+export interface SessionDetailDocument {
+  id: string;
   filename: string;
   file_size: number;
-  created_at: string;
-  message_count: number;
-  summary_title: string;
-  qdrant_session_id: string;
+  summary: Record<string, any>;
 }
 
 export interface SessionDetail {
   id: string;
-  filename: string;
-  file_size: number;
   created_at: string;
   qdrant_session_id: string;
-  summary: Record<string, any>;
+  documents: SessionDetailDocument[];
   messages: ChatMessageRecord[];
 }
 

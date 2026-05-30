@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, X, Users, Activity, HardDrive, Cpu, CheckCircle2, MoreVertical, Search, ShieldAlert, Trash2 } from 'lucide-react';
+import { Shield, X, Users, Activity, HardDrive, Cpu, CheckCircle2, MoreVertical, Search, ShieldAlert, Trash2, Mail, Send, Loader2 } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
-import { fetchAdminStats, fetchAdminUsers, toggleAdminStatus, deleteUser } from '../../services/api';
+import { fetchAdminStats, fetchAdminUsers, toggleAdminStatus, deleteUser, sendBroadcastEmail } from '../../services/api';
 import type { UserProfile } from '../../services/api';
 
 interface AdminStats {
@@ -22,6 +22,12 @@ export const AdminPanel: React.FC = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [activeTab, setActiveTab] = useState<'users' | 'broadcast'>('users');
+  const [broadcastSubject, setBroadcastSubject] = useState('');
+  const [broadcastBody, setBroadcastBody] = useState('');
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcastStatus, setBroadcastStatus] = useState({ message: '', error: false });
   
   useEffect(() => {
     if (showAdminPanel && currentUser?.is_admin) {
@@ -66,6 +72,24 @@ export const AdminPanel: React.FC = () => {
   };
 
   if (!showAdminPanel) return null;
+
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastSubject || !broadcastBody) return;
+    
+    setIsBroadcasting(true);
+    setBroadcastStatus({ message: '', error: false });
+    try {
+      const res = await sendBroadcastEmail(broadcastSubject, broadcastBody);
+      setBroadcastStatus({ message: res.message || 'Broadcast queued successfully!', error: false });
+      setBroadcastSubject('');
+      setBroadcastBody('');
+    } catch (err: any) {
+      setBroadcastStatus({ message: err.message || 'Failed to send broadcast.', error: true });
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
 
   const filteredUsers = users.filter(u => u.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -114,8 +138,15 @@ export const AdminPanel: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-[1200px] mx-auto space-y-8">
             
-            {/* Stats Grid */}
-            {stats && (
+            <div className="flex items-center gap-4 border-b border-white/[0.06] pb-2">
+              <button onClick={() => setActiveTab('users')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'users' ? 'text-emerald-400 border-b-2 border-emerald-500' : 'text-slate-400 hover:text-white'}`}>Overview & Users</button>
+              <button onClick={() => setActiveTab('broadcast')} className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'broadcast' ? 'text-emerald-400 border-b-2 border-emerald-500' : 'text-slate-400 hover:text-white'}`}>Broadcast Email</button>
+            </div>
+            
+            {activeTab === 'users' ? (
+              <>
+                {/* Stats Grid */}
+                {stats && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard 
                   title="Total Users" 
@@ -254,6 +285,40 @@ export const AdminPanel: React.FC = () => {
                 </table>
               </div>
             </div>
+              </>
+            ) : (
+              <div className="bg-[#121318] border border-white/[0.06] rounded-xl p-8">
+                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-emerald-500" />
+                  Broadcast Promotional Email
+                </h3>
+                <p className="text-sm text-slate-400 mb-8">Send an HTML-rich promotional email to all verified users in your platform. Powered by Resend.</p>
+                
+                {broadcastStatus.message && (
+                  <div className={`p-4 rounded-lg mb-6 text-sm ${broadcastStatus.error ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
+                    {broadcastStatus.message}
+                  </div>
+                )}
+                
+                <form onSubmit={handleBroadcast} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Email Subject</label>
+                    <input type="text" value={broadcastSubject} onChange={e => setBroadcastSubject(e.target.value)} required placeholder="e.g. Introducing Quro AI 2.0 🚀" className="w-full bg-black/40 border border-white/[0.06] rounded-lg px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">HTML Content</label>
+                    <textarea value={broadcastBody} onChange={e => setBroadcastBody(e.target.value)} required rows={12} placeholder="<h1>Big News!</h1><p>Check out our new features!</p>" className="w-full bg-black/40 border border-white/[0.06] rounded-lg px-4 py-4 text-sm text-emerald-400 placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 font-mono transition-colors" />
+                    <p className="text-[11px] text-slate-500 mt-2">This content will be securely injected inside the central Quro AI email template.</p>
+                  </div>
+                  <div className="flex justify-end pt-4">
+                    <button type="submit" disabled={isBroadcasting} className="btn-solid flex items-center gap-2 py-3 px-6 text-sm">
+                      {isBroadcasting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      {isBroadcasting ? 'Queueing Broadcast...' : 'Broadcast to Verified Users'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
             
           </div>
         </div>

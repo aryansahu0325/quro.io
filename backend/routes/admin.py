@@ -1,8 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+import datetime
 from database import get_db
 from models.user import User, DocumentSession, GuestSession
 from routes.auth import admin_required
+from services.email_service import send_promotional_email_task
+
+class BroadcastEmailSchema(BaseModel):
+    subject: str
+    html_content: str
 
 router = APIRouter()
 
@@ -99,3 +106,15 @@ async def delete_user(user_id: str, db: Session = Depends(get_db), current_admin
     db.commit()
     
     return {"message": "User successfully deleted"}
+
+@router.post("/broadcast")
+async def broadcast_email(payload: BroadcastEmailSchema, background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_admin: User = Depends(admin_required)):
+    """Send a promotional HTML email to all verified users."""
+    verified_users = db.query(User).filter(User.is_verified == True).all()
+    if not verified_users:
+        raise HTTPException(status_code=400, detail="No verified users found to broadcast to.")
+        
+    for u in verified_users:
+        send_promotional_email_task.delay(u.email, payload.subject, payload.html_content)
+        
+    return {"message": f"Broadcast queued for {len(verified_users)} verified users."}

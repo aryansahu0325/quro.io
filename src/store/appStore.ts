@@ -14,9 +14,10 @@ export interface UserProfile {
   id: string;
   email: string;
   api_key: string;
+  is_admin?: boolean;
 }
 
-interface Summary {
+export interface Summary {
   title: string;
   english_summary: string;
   hindi_summary: string;
@@ -25,15 +26,22 @@ interface Summary {
   crust: string[];
 }
 
+export interface WorkspaceDocument {
+  filename: string;
+  file_size: number;
+  summary: Summary;
+}
+
 interface AppState {
   sessionId: string | null;
-  sessionDbId: string | null;           // DB id of the current DocumentSession
-  uploadedFile: File | null;
-  pendingFile: File | null;             // File queued while auth modal is open
+  sessionDbId: string | null;           // DB id of the first DocumentSession (for chat anchoring)
+  uploadedFiles: File[];
+  pendingFiles: File[];                 // Files queued while auth modal is open
+  pendingFile: File | null;             // Single file waiting for auth
   isProcessing: boolean;
-  summary: Summary | null;
+  documents: WorkspaceDocument[];
   messages: Message[];
-  activeTab: 'summary' | 'chat';
+  activeTab: 'summary' | 'synthesis' | 'chat';
   isModalOpen: boolean;
   showApiDocs: boolean;
   showAdminPanel: boolean;
@@ -47,13 +55,14 @@ interface AppState {
   // Actions
   setSessionId: (id: string) => void;
   setSessionDbId: (id: string | null) => void;
-  setUploadedFile: (file: File | null) => void;
+  setUploadedFiles: (files: File[]) => void;
+  setPendingFiles: (files: File[]) => void;
   setPendingFile: (file: File | null) => void;
   setIsProcessing: (status: boolean) => void;
-  setSummary: (summary: Summary | null) => void;
+  setDocuments: (docs: WorkspaceDocument[]) => void;
   addMessage: (message: Message) => void;
   updateLastMessage: (text: string, isStreaming?: boolean) => void;
-  setActiveTab: (tab: 'summary' | 'chat') => void;
+  setActiveTab: (tab: 'summary' | 'synthesis' | 'chat') => void;
   setIsModalOpen: (status: boolean) => void;
   setShowApiDocs: (status: boolean) => void;
   setShowAdminPanel: (status: boolean) => void;
@@ -79,10 +88,11 @@ function loadStoredUser(): UserProfile | null {
 export const useAppStore = create<AppState>((set, get) => ({
   sessionId: null,
   sessionDbId: null,
-  uploadedFile: null,
+  uploadedFiles: [],
+  pendingFiles: [],
   pendingFile: null,
   isProcessing: false,
-  summary: null,
+  documents: [],
   messages: [],
   activeTab: 'summary',
   isModalOpen: false,
@@ -97,10 +107,11 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setSessionId: (id) => set({ sessionId: id }),
   setSessionDbId: (id) => set({ sessionDbId: id }),
-  setUploadedFile: (file) => set({ uploadedFile: file }),
+  setUploadedFiles: (files) => set({ uploadedFiles: files }),
+  setPendingFiles: (files) => set({ pendingFiles: files }),
   setPendingFile: (file) => set({ pendingFile: file }),
   setIsProcessing: (status) => set({ isProcessing: status }),
-  setSummary: (summary) => set({ summary }),
+  setDocuments: (docs) => set({ documents: docs }),
   addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
   updateLastMessage: (text, isStreaming) => set((state) => {
     const lastMessage = state.messages[state.messages.length - 1];
@@ -156,10 +167,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({
       token: null,
       user: null,
-      uploadedFile: null,
+      uploadedFiles: [],
+      pendingFiles: [],
       pendingFile: null,
       isProcessing: false,
-      summary: null,
+      documents: [],
       messages: [],
       sessionId: null,
       sessionDbId: null,
@@ -169,10 +181,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
   reset: () => set({
-    uploadedFile: null,
+    uploadedFiles: [],
+    pendingFiles: [],
     pendingFile: null,
     isProcessing: false,
-    summary: null,
+    documents: [],
     messages: [],
     activeTab: 'summary',
     sessionId: null,

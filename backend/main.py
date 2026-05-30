@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
-from routes import assistant, upload, challenge, health, auth, sessions, admin
+from routes import assistant, upload, challenge, health, auth, sessions, admin, synthesis
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -49,12 +49,16 @@ async def favicon():
 # CORS
 origins = list(settings.ALLOWED_ORIGINS)
 if "*" in origins:
-    origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
 else:
     if "http://localhost:5173" not in origins:
         origins.append("http://localhost:5173")
     if "http://127.0.0.1:5173" not in origins:
         origins.append("http://127.0.0.1:5173")
+    if "http://localhost:5174" not in origins:
+        origins.append("http://localhost:5174")
+    if "http://127.0.0.1:5174" not in origins:
+        origins.append("http://127.0.0.1:5174")
 
 app.add_middleware(
     CORSMiddleware,
@@ -72,6 +76,7 @@ app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
 app.include_router(challenge.router, prefix="/api/challenge", tags=["Challenge"])
 app.include_router(health.router, prefix="/api/health", tags=["Health"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(synthesis.router, prefix="/api/synthesis", tags=["Synthesis"])
 
 @app.get("/")
 async def root():

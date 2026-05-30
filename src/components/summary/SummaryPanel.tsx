@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppStore } from '../../store/appStore';
-import { Target, Zap, Binary, Image as ImageIcon, BookOpen, Share2, Loader2 } from 'lucide-react';
+import type { WorkspaceDocument } from '../../store/appStore';
+import { Target, Zap, Binary, Image as ImageIcon, BookOpen, Share2, Loader2, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
@@ -19,52 +20,27 @@ const renderMixedText = (text: string) => {
   });
 };
 
-export const SummaryPanel: React.FC = () => {
-  const { summary, isProcessing } = useAppStore();
+const demoSummary = {
+  crust: [
+    "Quantum state vector optimization",
+    "Neural weight distribution analysis",
+    "Semantic resonance mapping"
+  ],
+  english_summary: "The research outlines a new framework for high-dimensional vector optimization using neural resonance protocols.",
+  hindi_summary: "यह शोध न्यूरल रेजोनेंस प्रोटोकॉल का उपयोग करके उच्च-आयामी वेक्टर अनुकूलन के लिए एक नया ढांचा प्रस्तुत करता है।",
+  mathematical_insights: [
+    "E = mc^2",
+    "\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}",
+    "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\epsilon_0}"
+  ],
+  pictorial_concepts: ["Neural Schematic v4"]
+};
 
-  // Mock data with proper Hindi and LaTeX for demonstration if summary is empty
-  const demoSummary = summary || {
-    crust: [
-      "Quantum state vector optimization",
-      "Neural weight distribution analysis",
-      "Semantic resonance mapping"
-    ],
-    english_summary: "The research outlines a new framework for high-dimensional vector optimization using neural resonance protocols.",
-    hindi_summary: "यह शोध न्यूरल रेजोनेंस प्रोटोकॉल का उपयोग करके उच्च-आयामी वेक्टर अनुकूलन के लिए एक नया ढांचा प्रस्तुत करता है।",
-    mathematical_insights: [
-      "E = mc^2",
-      "\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}",
-      "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\epsilon_0}"
-    ],
-    pictorial_concepts: ["Neural Schematic v4"]
-  };
-
-  if (isProcessing) {
-    return (
-      <div className="glass h-full flex flex-col items-center justify-center gap-4 text-center p-8">
-        <div className="relative">
-          <Loader2 className="w-5 h-5 text-emerald-500/40 animate-spin" />
-        </div>
-        <div className="space-y-1">
-          <p className="text-[10px] font-bold text-white tracking-widest uppercase">Analyzing Node</p>
-          <div className="flex gap-1 justify-center">
-            {[1, 2, 3].map(i => (
-              <motion.div 
-                key={i}
-                animate={{ opacity: [0.2, 1, 0.2] }}
-                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                className="w-1 h-1 rounded-full bg-emerald-500" 
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+const SingleDocSummary: React.FC<{ summary: any }> = ({ summary }) => {
+  const data = summary && Object.keys(summary).length > 0 ? summary : demoSummary;
 
   return (
-    <div className="h-full overflow-y-auto scroll space-y-2 pr-1">
-
+    <div className="space-y-2">
       {/* Semantic Mapping */}
       <Section
         icon={<Share2 className="w-3.5 h-3.5 text-emerald-500/60" />}
@@ -90,7 +66,7 @@ export const SummaryPanel: React.FC = () => {
       {/* Executive Gist */}
       <Section icon={<Zap className="w-3.5 h-3.5 text-emerald-500/60" />} title="Executive Gist">
         <ul className="space-y-1.5">
-          {demoSummary.crust?.map((item: string, i: number) => (
+          {data.crust?.map((item: string, i: number) => (
             <li key={i} className="flex items-start gap-2.5 text-[10px] text-slate-400 leading-normal font-medium">
               <div className="w-1 h-1 rounded-full bg-emerald-500/40 flex-shrink-0 mt-1.5" />
               {item}
@@ -102,11 +78,11 @@ export const SummaryPanel: React.FC = () => {
       {/* Dual summaries */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <Section icon={<BookOpen className="w-3.5 h-3.5 text-emerald-500/60" />} title="Thesis">
-          <p className="text-[10px] text-slate-500 leading-normal font-medium">{demoSummary.english_summary}</p>
+          <p className="text-[10px] text-slate-500 leading-normal font-medium">{data.english_summary}</p>
         </Section>
         <Section icon={<Target className="w-3.5 h-3.5 text-indigo-500/60" />} title="सारांश">
           <p className="text-[10px] text-emerald-500/60 leading-normal font-medium font-hindi tracking-wide">
-            {demoSummary.hindi_summary}
+            {data.hindi_summary}
           </p>
         </Section>
       </div>
@@ -115,7 +91,7 @@ export const SummaryPanel: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4">
         <Section icon={<Binary className="w-3.5 h-3.5 text-amber-500/60" />} title="Axioms">
           <div className="space-y-2">
-            {demoSummary.mathematical_insights?.map((item: string, i: number) => (
+            {data.mathematical_insights?.map((item: string, i: number) => (
               <div key={i} className="bg-black/20 p-2 rounded border border-white/[0.03] overflow-x-auto overflow-y-hidden scroll">
                 <div className="text-amber-500/70 text-[10px] whitespace-pre-wrap">
                   {renderMixedText(item)}
@@ -127,8 +103,8 @@ export const SummaryPanel: React.FC = () => {
         <Section icon={<ImageIcon className="w-3.5 h-3.5 text-emerald-500/60" />} title="Schematics">
           <div className="space-y-2">
             <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10 group cursor-zoom-in">
-              <img 
-                src="https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop" 
+              <img
+                src="https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop"
                 alt="Neural Schematic"
                 className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity"
               />
@@ -140,6 +116,94 @@ export const SummaryPanel: React.FC = () => {
           </div>
         </Section>
       </div>
+    </div>
+  );
+};
+
+export const SummaryPanel: React.FC = () => {
+  const { documents, isProcessing } = useAppStore();
+  const [activeDocIndex, setActiveDocIndex] = React.useState(0);
+
+  // Clamp activeDocIndex
+  React.useEffect(() => {
+    if (activeDocIndex >= documents.length && documents.length > 0) {
+      setActiveDocIndex(0);
+    }
+  }, [documents.length]);
+
+  if (isProcessing) {
+    return (
+      <div className="glass h-full flex flex-col items-center justify-center gap-4 text-center p-8">
+        <div className="relative">
+          <Loader2 className="w-5 h-5 text-emerald-500/40 animate-spin" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold text-white tracking-widest uppercase">Analyzing Node</p>
+          <div className="flex gap-1 justify-center">
+            {[1, 2, 3].map(i => (
+              <motion.div
+                key={i}
+                animate={{ opacity: [0.2, 1, 0.2] }}
+                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                className="w-1 h-1 rounded-full bg-emerald-500"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const activeDoc = documents[activeDocIndex];
+
+  return (
+    <div className="h-full overflow-y-auto scroll space-y-2 pr-1">
+      {/* Multi-doc selector strip */}
+      {documents.length > 1 && (
+        <div className="glass p-2">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-600">
+              {documents.length} Papers Loaded
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setActiveDocIndex(Math.max(0, activeDocIndex - 1))}
+                disabled={activeDocIndex === 0}
+                className="p-0.5 rounded hover:bg-white/5 disabled:opacity-20 transition-all"
+              >
+                <ChevronLeft className="w-3 h-3 text-slate-500" />
+              </button>
+              <span className="text-[9px] text-emerald-400 font-bold">{activeDocIndex + 1}/{documents.length}</span>
+              <button
+                onClick={() => setActiveDocIndex(Math.min(documents.length - 1, activeDocIndex + 1))}
+                disabled={activeDocIndex === documents.length - 1}
+                className="p-0.5 rounded hover:bg-white/5 disabled:opacity-20 transition-all"
+              >
+                <ChevronRight className="w-3 h-3 text-slate-500" />
+              </button>
+            </div>
+          </div>
+          <div className="flex gap-1 overflow-x-auto scroll-none">
+            {documents.map((doc, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveDocIndex(i)}
+                className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[9px] font-medium whitespace-nowrap transition-all border
+                  ${activeDocIndex === i
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : 'text-slate-600 hover:text-slate-400 border-transparent hover:border-white/[0.06]'
+                  }`}
+              >
+                <FileText className="w-3 h-3 flex-shrink-0" />
+                {doc.filename.length > 22 ? doc.filename.slice(0, 20) + '…' : doc.filename}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Active paper summary */}
+      <SingleDocSummary summary={activeDoc?.summary} />
     </div>
   );
 };
