@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Cpu, Shield, Globe, ArrowRight, Loader2, BookOpen, Zap, History, CheckCircle2, Mail, Lock } from 'lucide-react';
+import { X, Cpu, Shield, Globe, ArrowRight, Loader2, BookOpen, Zap, History, CheckCircle2, Mail } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useAppStore } from '../../store/appStore';
+import { useAppStore, type UserProfile } from '../../store/appStore';
 import { loginUser, registerUser, verifyOtp, resendOtp, requestLoginOtp, verifyLoginOtp, forgotPassword, resetPassword, googleLogin } from '../../services/api';
 
 type AuthMode = 'login' | 'register' | 'verify' | 'login-otp' | 'forgot-password' | 'reset-password';
+
+interface AuthResponse {
+  access_token: string;
+  user: UserProfile;
+  message?: string;
+}
 
 interface AuthModalProps {
   onSuccessCallback?: () => void;
@@ -47,9 +53,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
         setPendingFile(null);
       }
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, setPendingFile]);
 
-  const handleSuccess = async (data: any) => {
+  const handleSuccess = async (data: AuthResponse) => {
     setToken(data.access_token);
     setUser(data.user);
     setIsModalOpen(false);
@@ -65,8 +71,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
         setError('');
         const data = await googleLogin(tokenResponse.access_token);
         await handleSuccess(data);
-      } catch (err: any) {
-        setError(err.message || 'Google Auth failed. Please check your credentials.');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Google Auth failed. Please check your credentials.';
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -93,8 +100,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
           try {
             const data = await loginUser(email, password);
             await handleSuccess(data);
-          } catch (err: any) {
-            if (err.message === "EMAIL_NOT_VERIFIED") {
+          } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : '';
+            if (errorMsg === "EMAIL_NOT_VERIFIED") {
               setError("Email not verified. We've sent a new code.");
               await resendOtp(email, 'signup');
               setMode('verify');
@@ -125,8 +133,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
         setMessage('Password successfully updated! You can now log in.');
         setMode('login');
       }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -148,8 +157,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
         setMessage('Reset code resent successfully.');
       }
       setResendCooldown(30);
-    } catch (err: any) {
-      setError(err.message || 'Failed to resend code');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to resend code';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -415,7 +425,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onSuccessCallback }) => {
                     
                     <button
                       type="button"
-                      onClick={handleGoogleLogin}
+                      onClick={() => handleGoogleLogin()}
                       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] rounded-xl transition-all text-xs text-white"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
