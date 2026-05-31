@@ -41,3 +41,4 @@ jinja2==3.1.5
 
 # Security
 bcrypt>=4.0.0
+python-jose[cryptography]>=3.3.0
