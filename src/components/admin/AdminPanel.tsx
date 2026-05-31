@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, X, Users, Activity, HardDrive, Cpu, CheckCircle2, MoreVertical, Search, ShieldAlert, Trash2, Mail, Send, Loader2 } from 'lucide-react';
+import { Shield, X, Users, Activity, HardDrive, CheckCircle2, Search, ShieldAlert, Trash2, Mail, Send, Loader2 } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { fetchAdminStats, fetchAdminUsers, toggleAdminStatus, deleteUser, sendBroadcastEmail } from '../../services/api';
 import type { UserProfile } from '../../services/api';
@@ -14,6 +14,14 @@ interface AdminStats {
 interface AdminUser extends UserProfile {
   created_at: string;
   session_count: number;
+}
+
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  subtitle: string;
+  icon: React.ComponentType<{ className?: string }>;
+  colorClass: string;
 }
 
 export const AdminPanel: React.FC = () => {
@@ -84,8 +92,9 @@ export const AdminPanel: React.FC = () => {
       setBroadcastStatus({ message: res.message || 'Broadcast queued successfully!', error: false });
       setBroadcastSubject('');
       setBroadcastBody('');
-    } catch (err: any) {
-      setBroadcastStatus({ message: err.message || 'Failed to send broadcast.', error: true });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to send broadcast.';
+      setBroadcastStatus({ message, error: true });
     } finally {
       setIsBroadcasting(false);
     }
@@ -93,7 +102,7 @@ export const AdminPanel: React.FC = () => {
 
   const filteredUsers = users.filter(u => u.email.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const StatCard = ({ title, value, subtitle, icon: Icon, colorClass }: any) => (
+  const StatCard = ({ title, value, subtitle, icon: Icon, colorClass }: StatCardProps) => (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}

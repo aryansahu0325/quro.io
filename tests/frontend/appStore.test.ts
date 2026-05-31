@@ -9,15 +9,15 @@ describe('appStore', () => {
   it('should initialize with default values', () => {
     const state = useAppStore.getState();
     expect(state.sessionId).toBe(null);
-    expect(state.uploadedFile).toBe(null);
+    expect(state.uploadedFiles).toBe(null);
     expect(state.messages).toEqual([]);
     expect(state.activeTab).toBe('summary');
   });
 
   it('should update active tab', () => {
     const { setActiveTab } = useAppStore.getState();
-    setActiveTab('challenge');
-    expect(useAppStore.getState().activeTab).toBe('challenge');
+    setActiveTab('synthesis');
+    expect(useAppStore.getState().activeTab).toBe('synthesis');
   });
 
   it('should add messages', () => {
@@ -30,9 +30,9 @@ describe('appStore', () => {
 
   it('should reset state', () => {
     const { setActiveTab, reset } = useAppStore.getState();
-    setActiveTab('challenge');
+    setActiveTab('synthesis');
     reset();
     expect(useAppStore.getState().activeTab).toBe('summary');
-    expect(useAppStore.getState().uploadedFile).toBe(null);
+    expect(useAppStore.getState().uploadedFiles).toBe(null);
   });
 });

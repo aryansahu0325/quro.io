@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Upload, CheckCircle2, Loader2, FileText } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
+import type { Summary } from '../../store/appStore';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+
+type UploadedDocument = {
+  filename: string;
+  file_size: number;
+  summary: Partial<Summary>;
+  session_db_id?: string | number;
+};
 
 export const DropZone: React.FC = () => {
   const {
@@ -24,15 +32,7 @@ export const DropZone: React.FC = () => {
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  React.useEffect(() => {
-    if (user && pendingFiles && pendingFiles.length > 0) {
-      const filesToUpload = [...pendingFiles];
-      setPendingFiles([]);
-      onUpload(filesToUpload);
-    }
-  }, [user, pendingFiles]);
-
-  const onUpload = async (files: File[]) => {
+  const onUpload = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
 
     if (!user) {
@@ -62,7 +62,7 @@ export const DropZone: React.FC = () => {
     formData.append('session_id', sid!);
 
     try {
-      const headers: any = {};
+      const headers: Record<string, string> = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -79,10 +79,10 @@ export const DropZone: React.FC = () => {
         }
       );
       
-      setDocuments(response.data.documents.map((d: any) => ({
+      setDocuments((response.data.documents as UploadedDocument[]).map((d) => ({
         filename: d.filename,
         file_size: d.file_size,
-        summary: d.summary
+        summary: d.summary as Summary
       })));
       
       if (response.data.documents.length > 0 && response.data.documents[0].session_db_id) {
@@ -92,9 +92,9 @@ export const DropZone: React.FC = () => {
       if (!user) {
         incrementGuestUpload();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Upload failed:', err);
-      if (err.response?.status === 403) {
+      if (axios.isAxiosError(err) && err.response?.status === 403) {
         setIsModalOpen(true);
       } else {
         alert('Upload failed. Please check the backend connection.');
@@ -106,14 +106,22 @@ export const DropZone: React.FC = () => {
       setIsUploading(false);
       setProgress(0);
     }
-  };
+  }, [user, guestUploadCount, sessionId, token, setUploadedFiles, setIsProcessing, setSessionId, setPendingFiles, setIsModalOpen, setDocuments, incrementGuestUpload]);
+
+  React.useEffect(() => {
+    if (user && pendingFiles && pendingFiles.length > 0) {
+      const filesToUpload = [...pendingFiles];
+      setPendingFiles([]);
+      onUpload(filesToUpload);
+    }
+  }, [user, pendingFiles, onUpload, setPendingFiles]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     
     const validFiles: File[] = [];
-    Array.from(e.dataTransfer.files).forEach((file: any) => {
+    Array.from(e.dataTransfer.files).forEach((file: File) => {
       if (file.type === 'application/pdf' || file.type === 'text/plain') {
         validFiles.push(file);
       }

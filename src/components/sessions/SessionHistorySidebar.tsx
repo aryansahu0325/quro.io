@@ -44,8 +44,8 @@ export const SessionHistorySidebar: React.FC = () => {
   const {
     showSessionHistory, setShowSessionHistory,
     pastSessions, isLoadingSessions, removeSession,
-    setSummary, setSessionId, setSessionDbId, addMessage,
-    reset, setUploadedFile,
+    setSessionId, setSessionDbId, addMessage,
+    reset,
   } = useAppStore();
 
   const [loadingId, setLoadingId] = React.useState<string | null>(null);
@@ -72,11 +72,6 @@ export const SessionHistorySidebar: React.FC = () => {
       // Restore session context
       setSessionId(detail.qdrant_session_id);
       setSessionDbId(detail.id);
-      setSummary(detail.summary as any);
-
-      // Create a dummy File reference (just for filename display)
-      const dummyFile = new File([], detail.filename, { type: 'application/pdf' });
-      setUploadedFile(dummyFile);
 
       // Restore chat messages
       for (const msg of detail.messages) {
@@ -211,10 +206,10 @@ export const SessionHistorySidebar: React.FC = () => {
                             {/* Info */}
                             <div className="flex-1 min-w-0">
                               <p className="text-[11px] font-medium text-slate-300 truncate group-hover:text-white transition-colors">
-                                {session.summary_title || session.filename}
+                                {(session as PastSession & { summary_title?: string }).summary_title || (session.filenames?.[0] ?? 'Untitled')}
                               </p>
                               <p className="text-[10px] text-slate-600 truncate mt-0.5">
-                                {session.filename}
+                                {session.filenames?.[0] ?? 'Untitled'}
                               </p>
                               <div className="flex items-center gap-2 mt-1.5">
                                 <div className="flex items-center gap-1 text-[9px] text-slate-700">
@@ -227,7 +222,7 @@ export const SessionHistorySidebar: React.FC = () => {
                                   {session.message_count} msgs
                                 </div>
                                 <div className="w-0.5 h-0.5 rounded-full bg-slate-800" />
-                                <span className="text-[9px] text-slate-700">{formatBytes(session.file_size)}</span>
+                                <span className="text-[9px] text-slate-700">{formatBytes((session as PastSession & { file_size?: number }).file_size ?? 0)}</span>
                               </div>
                             </div>
 

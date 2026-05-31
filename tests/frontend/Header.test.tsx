@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom';
 import { Header } from '../../src/components/layout/Header';
 import { BrowserRouter } from 'react-router-dom';
 

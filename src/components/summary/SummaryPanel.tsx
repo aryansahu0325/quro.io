@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAppStore } from '../../store/appStore';
-import type { WorkspaceDocument } from '../../store/appStore';
 import { Target, Zap, Binary, Image as ImageIcon, BookOpen, Share2, Loader2, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import 'katex/dist/katex.min.css';
@@ -20,24 +19,18 @@ const renderMixedText = (text: string) => {
   });
 };
 
-const demoSummary = {
-  crust: [
-    "Quantum state vector optimization",
-    "Neural weight distribution analysis",
-    "Semantic resonance mapping"
-  ],
-  english_summary: "The research outlines a new framework for high-dimensional vector optimization using neural resonance protocols.",
-  hindi_summary: "यह शोध न्यूरल रेजोनेंस प्रोटोकॉल का उपयोग करके उच्च-आयामी वेक्टर अनुकूलन के लिए एक नया ढांचा प्रस्तुत करता है।",
-  mathematical_insights: [
-    "E = mc^2",
-    "\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}",
-    "\\nabla \\cdot \\mathbf{E} = \\frac{\\rho}{\\epsilon_0}"
-  ],
-  pictorial_concepts: ["Neural Schematic v4"]
+type SummaryData = {
+  crust?: string[];
+  english_summary?: string;
+  hindi_summary?: string;
+  mathematical_insights?: string[];
+  pictorial_concepts?: string[];
 };
 
-const SingleDocSummary: React.FC<{ summary: any }> = ({ summary }) => {
-  const data = summary && Object.keys(summary).length > 0 ? summary : demoSummary;
+const SingleDocSummary: React.FC<{ summary?: SummaryData }> = ({ summary }) => {
+  if (!summary || Object.keys(summary).length === 0) {
+    return null;
+  }
 
   return (
     <div className="space-y-2">
@@ -66,7 +59,7 @@ const SingleDocSummary: React.FC<{ summary: any }> = ({ summary }) => {
       {/* Executive Gist */}
       <Section icon={<Zap className="w-3.5 h-3.5 text-emerald-500/60" />} title="Executive Gist">
         <ul className="space-y-1.5">
-          {data.crust?.map((item: string, i: number) => (
+          {summary.crust?.map((item: string, i: number) => (
             <li key={i} className="flex items-start gap-2.5 text-[10px] text-slate-400 leading-normal font-medium">
               <div className="w-1 h-1 rounded-full bg-emerald-500/40 flex-shrink-0 mt-1.5" />
               {item}
@@ -78,11 +71,11 @@ const SingleDocSummary: React.FC<{ summary: any }> = ({ summary }) => {
       {/* Dual summaries */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <Section icon={<BookOpen className="w-3.5 h-3.5 text-emerald-500/60" />} title="Thesis">
-          <p className="text-[10px] text-slate-500 leading-normal font-medium">{data.english_summary}</p>
+          <p className="text-[10px] text-slate-500 leading-normal font-medium">{summary.english_summary}</p>
         </Section>
         <Section icon={<Target className="w-3.5 h-3.5 text-indigo-500/60" />} title="सारांश">
           <p className="text-[10px] text-emerald-500/60 leading-normal font-medium font-hindi tracking-wide">
-            {data.hindi_summary}
+            {summary.hindi_summary}
           </p>
         </Section>
       </div>
@@ -91,7 +84,7 @@ const SingleDocSummary: React.FC<{ summary: any }> = ({ summary }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pb-4">
         <Section icon={<Binary className="w-3.5 h-3.5 text-amber-500/60" />} title="Axioms">
           <div className="space-y-2">
-            {data.mathematical_insights?.map((item: string, i: number) => (
+            {summary.mathematical_insights?.map((item: string, i: number) => (
               <div key={i} className="bg-black/20 p-2 rounded border border-white/[0.03] overflow-x-auto overflow-y-hidden scroll">
                 <div className="text-amber-500/70 text-[10px] whitespace-pre-wrap">
                   {renderMixedText(item)}

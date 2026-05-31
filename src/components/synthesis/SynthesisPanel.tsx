@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '../../store/appStore';
 import { 
   Sparkles, BookOpen, AlertTriangle, Loader2, Activity, FileText, 
-  CheckCircle2, GitMerge, PenTool, Download, Compass, RefreshCw, FileDown
+  GitMerge, PenTool, Download, Compass, RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -83,9 +83,10 @@ export const SynthesisPanel: React.FC = () => {
       } else {
         setError(data.message || 'Analysis failed');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Synthesis analysis failed:', err);
-      setError(err.response?.data?.detail || 'Failed to complete research synthesis. Please verify server connection.');
+      const detail = axios.isAxiosError(err) ? err.response?.data?.detail : undefined;
+      setError(detail || 'Failed to complete research synthesis. Please verify server connection.');
     } finally {
       setLoading(false);
     }
@@ -142,7 +143,7 @@ export const SynthesisPanel: React.FC = () => {
           }
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Co-writing streaming failed:', err);
       setGeneratedPaper((prev) => prev + '\n\n⚠️ *Generation interrupted. Check your network or LLM server.*');
     } finally {

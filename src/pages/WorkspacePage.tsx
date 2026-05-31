@@ -8,8 +8,9 @@ import { FileText, Brain, LayoutDashboard, Settings, Sparkles } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const WorkspacePage: React.FC = () => {
-  const { activeTab, setActiveTab, uploadedFiles, documents, reset, sessionDbId, user } = useAppStore();
+  const { activeTab, setActiveTab, uploadedFiles, reset, sessionDbId, user } = useAppStore();
   const [mobileView, setMobileView] = React.useState<'preview' | 'summary' | 'chat'>('summary');
+  type MobileViewType = 'preview' | 'summary' | 'chat';
   const totalSize = uploadedFiles.reduce((acc, f) => acc + f.size, 0);
   const fileSizeKb = (totalSize / 1024).toFixed(1);
 
@@ -105,7 +106,7 @@ export const WorkspacePage: React.FC = () => {
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setMobileView(tab.id as any)}
+              onClick={() => setMobileView(tab.id as MobileViewType)}
               className={`text-[9px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap
                 ${mobileView === tab.id ? 'text-emerald-500' : 'text-slate-600'}`}
             >

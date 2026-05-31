@@ -241,7 +241,7 @@ export interface SessionDetailDocument {
   id: string;
   filename: string;
   file_size: number;
-  summary: Record<string, any>;
+  summary: Record<string, string | number | boolean | null>;
 }
 
 export interface SessionDetail {

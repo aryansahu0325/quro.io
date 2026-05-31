@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { CreditCard, Sparkles, Building2, MessageCircleQuestion } from 'lucide-react';
 import { LegalPageShell } from './LegalPageShell';
 
