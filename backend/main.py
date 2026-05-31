@@ -48,17 +48,12 @@ async def favicon():
 
 # CORS
 origins = list(settings.ALLOWED_ORIGINS)
-if "*" in origins:
-    origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
-else:
-    if "http://localhost:5173" not in origins:
-        origins.append("http://localhost:5173")
-    if "http://127.0.0.1:5173" not in origins:
-        origins.append("http://127.0.0.1:5173")
-    if "http://localhost:5174" not in origins:
-        origins.append("http://localhost:5174")
-    if "http://127.0.0.1:5174" not in origins:
-        origins.append("http://127.0.0.1:5174")
+if "*" not in origins:
+    # Add development origins if not already present
+    dev_origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
+    for origin in dev_origins:
+        if origin not in origins:
+            origins.append(origin)
 
 app.add_middleware(
     CORSMiddleware,
