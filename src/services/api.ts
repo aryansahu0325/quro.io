@@ -12,14 +12,10 @@ function authHeaders(): Record<string, string> {
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export async function loginUser(email: string, password: string) {
-  const formData = new URLSearchParams();
-  formData.append('username', email);
-  formData.append('password', password);
-
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: formData,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
   if (!res.ok) {
