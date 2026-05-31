@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from jose import jwt
 from config import settings
 
-SECRET_KEY = getattr(settings, "SECRET_KEY", "supersecretkey-change-in-production")
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 

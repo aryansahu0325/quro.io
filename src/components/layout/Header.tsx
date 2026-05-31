@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Cpu, RefreshCw, History, LogOut, ChevronDown, User, Key, Shield } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { navigateToPath } from '../../utils/navigation';
 
 export const Header: React.FC = () => {
   const {
@@ -39,7 +40,7 @@ export const Header: React.FC = () => {
 
         {/* Logo */}
         <motion.div
-          onClick={() => { reset(); setShowApiDocs(false); }}
+          onClick={() => { reset(); setShowApiDocs(false); navigateToPath('/'); }}
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-2 cursor-pointer group"
@@ -59,8 +60,8 @@ export const Header: React.FC = () => {
 
         {/* Nav links */}
         <div className="hidden lg:flex items-center gap-6 text-[11px] font-medium text-slate-500">
-          <button onClick={() => setShowApiDocs(false)} className="hover:text-slate-300 transition-colors">Home</button>
-          <button onClick={() => setShowApiDocs(true)} className="hover:text-slate-300 transition-colors">API Docs</button>
+          <button onClick={() => { setShowApiDocs(false); navigateToPath('/'); }} className="hover:text-slate-300 transition-colors">Home</button>
+          <button onClick={() => { setShowApiDocs(true); navigateToPath('/docs'); }} className="hover:text-slate-300 transition-colors">API Docs</button>
         </div>
 
         {/* Actions */}

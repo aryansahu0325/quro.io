@@ -1,63 +1,69 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config import settings
+import logging
+
+logger = logging.getLogger("quro.database")
 
 DATABASE_URL = settings.DATABASE_URL
 
-connect_args = {}
-engine_args = {}
+# Enforce Neon PostgreSQL — reject any other DB at startup
+if not DATABASE_URL.startswith("postgresql"):
+    raise RuntimeError(
+        f"Invalid DATABASE_URL: only Neon PostgreSQL (postgresql://) is supported. "
+        f"Got: {DATABASE_URL[:40]}..."
+    )
 
-if DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
-else:
-    # Industry-grade pooling settings for production serverless databases (e.g., Neon PostgreSQL)
-    # pool_pre_ping: Pessimistic check to verify connection viability before execution.
-    # pool_recycle: Prevent connections from sitting idle and getting closed by Neon.
-    engine_args = {
-        "pool_pre_ping": True,
-        "pool_recycle": 300,
-        "pool_size": 10,
-        "max_overflow": 20
-    }
+# Industry-grade connection pool settings for Neon serverless PostgreSQL
+# pool_pre_ping   : Validates connection health before use (detects stale connections)
+# pool_recycle    : Recycles connections every 5 min — prevents Neon idle timeout cuts
+# pool_size       : Persistent connections kept alive in the pool
+# max_overflow    : Burst connections above pool_size allowed under heavy load
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    pool_size=10,
+    max_overflow=20
+)
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args, **engine_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 Base = declarative_base()
+
 
 def run_migrations(engine):
     """
     Lightweight, resilient automatic migration runner.
-    Applies schema upgrades (such as adding OTP and admin columns) to existing tables,
-    ensuring compatibility on active Neon Postgres/SQLite databases without losing data.
+    Applies schema upgrades (adding OTP and admin columns) to existing tables
+    on Neon PostgreSQL without data loss.
     """
-    from sqlalchemy import text
-    import logging
-    logger = logging.getLogger("quro.db_migrations")
     logger.info("Initializing automatic schema migration checks...")
-    
+
     with engine.connect() as conn:
         columns_to_add = [
-            ("is_admin", "BOOLEAN DEFAULT FALSE"),
-            ("is_verified", "BOOLEAN DEFAULT FALSE"),
-            ("verification_otp", "VARCHAR"),
-            ("verification_otp_expires_at", "TIMESTAMP"),
-            ("login_otp", "VARCHAR"),
-            ("login_otp_expires_at", "TIMESTAMP"),
-            ("reset_password_otp", "VARCHAR"),
-            ("reset_password_otp_expires_at", "TIMESTAMP"),
-            ("google_id", "VARCHAR")
+            ("is_admin",                        "BOOLEAN DEFAULT FALSE"),
+            ("is_verified",                     "BOOLEAN DEFAULT FALSE"),
+            ("verification_otp",                "VARCHAR"),
+            ("verification_otp_expires_at",     "TIMESTAMP"),
+            ("login_otp",                       "VARCHAR"),
+            ("login_otp_expires_at",            "TIMESTAMP"),
+            ("reset_password_otp",              "VARCHAR"),
+            ("reset_password_otp_expires_at",   "TIMESTAMP"),
+            ("google_id",                       "VARCHAR"),
         ]
-        
+
         for column_name, column_type in columns_to_add:
             try:
                 with conn.begin():
-                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {column_name} {column_type};"))
-                    logger.info(f"Database Migrations: Added column '{column_name}' to users table.")
+                    conn.execute(
+                        text(f"ALTER TABLE users ADD COLUMN {column_name} {column_type};")
+                    )
+                    logger.info(f"Migration: Added column '{column_name}' to users table.")
             except Exception:
-                # Column already exists or table is empty - ignore error
+                # Column already exists — safe to ignore
                 pass
+
 
 def get_db():
     db = SessionLocal()
